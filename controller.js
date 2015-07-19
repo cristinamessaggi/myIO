@@ -1,4 +1,4 @@
-// MyIO version 2 - covering: DM-008, DM-009
+// MyIO version 3 - covering: DM-003, DM-010
 
 var myIO = myIO || {};
 
@@ -54,8 +54,8 @@ myIO.controller = (function ($) {
         try {
             localDB.transaction(function(transaction){
                 transaction.executeSql(query, [], nullDataHandler, errorHandler);
-                updateStatus("Table 'myIO_DB' is present");
-                document.getElementById('database').innerHTML = ""; // added on version 2
+                // updateStatus("Table 'myIO_DB' is present");
+                // document.getElementById('database').innerHTML = ""; (removed on version 3)
             });
         }
         catch (e) {
@@ -100,7 +100,7 @@ myIO.controller = (function ($) {
                             aux2 = 1;
                         }
                     }
-                    showData();
+                    // showData(); (removed on version 3)
                 }, function(transaction, error){
                     updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                 });
@@ -148,6 +148,7 @@ myIO.controller = (function ($) {
                         li.appendChild(liText);
                         document.getElementById("database").appendChild(li);
                     }
+                    updateStatus("Table 'myIO_DB' is present"); // added on version 3
                 }, function(transaction, error){
                     updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                 });
@@ -164,7 +165,8 @@ myIO.controller = (function ($) {
             localDB.transaction(function(transaction){
                 transaction.executeSql(query, [], nullDataHandler, errorHandler);
                 updateStatus("Table 'myIO_DB' has been deleted");
-                document.getElementById('database').innerHTML = "Empty!";
+                document.getElementById('database').innerHTML = "data has been deleted, new table is being created..."; // line updated on version 3
+                checkDB(); // DM-010, added on version 3
             });
         }
         catch (e) {
@@ -185,10 +187,57 @@ myIO.controller = (function ($) {
         document.getElementById('status').innerHTML = status;
     };
     
+    var renderMonths = function () { // DM-003, added on version 3
+        var query = 'SELECT * FROM myIO_DB WHERE id=1;';
+        try {
+            localDB.transaction(function(transaction){
+                transaction.executeSql(query, [], function(transaction, results){
+                    for (var i = 0; i < results.rows.length; i++) {
+                        var row = results.rows.item(i);
+                        var view = $("#home-content");
+                        view.empty();
+                        var auxm = row['month'];
+                        var y = row['year'];
+                        var ul = $("<ul id=\"notes-list\" data-role=\"listview\" data-theme=\"c\"</ul>").appendTo(view);
+                        for (i = 0; i < number_months; i++) {
+                            $("<li>"
+                              + "<a href=\"#days?monthId="+auxm+"\">"
+                              + "<h3>"+month[auxm]+" "+y+"</h3>"
+                              + "</a>"
+                              + "</li>").appendTo(ul);
+                            auxm++;
+                            if (auxm === 12) {
+                                auxm = 0;
+                                y++;
+                            }
+                        }
+                        $("<li data-theme=\"b\"><h3>status:</h3><p id=\"status\"></p></li>").appendTo(ul);
+                        $("<li data-theme=\"b\"><h3>database:</h3><p id=\"database\"></p></li>").appendTo(ul);
+                        ul.listview();
+                        showData();
+                    }
+                }, function(transaction, error){
+                    updateStatus("Error: " + error.code + "<br>Message: " + error.message);
+                });
+            });
+        }
+        catch (e) {
+            updateStatus("Error: unable to select myIO_DB from the db " + e + ".");
+        };
+    };
+    
+    var onPageChange = function (event, data) { // added on version 3
+        var toPageId = data.toPage.attr("id");
+        switch (toPageId) {
+            case "home": renderMonths(); break; // DM-003, added on version 3
+        }
+    };
+    
     var init = function () {
         var d = $(document);
+        d.bind("pagechange", onPageChange); // added on version 3
         d.delegate("#bt_reset", "tap", dropDB); // DM-009, added on version 2
-        d.delegate("#bt_new", "tap", checkDB); // added on version 2
+        // d.delegate("#bt_new", "tap", checkDB); (removed on version 3)
         checkDB();
     };
     
