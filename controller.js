@@ -1,4 +1,4 @@
-// MyIO version 1 - covering: DM-001, DM-002
+// MyIO version 2 - covering: DM-008, DM-009
 
 var myIO = myIO || {};
 
@@ -55,6 +55,7 @@ myIO.controller = (function ($) {
             localDB.transaction(function(transaction){
                 transaction.executeSql(query, [], nullDataHandler, errorHandler);
                 updateStatus("Table 'myIO_DB' is present");
+                document.getElementById('database').innerHTML = ""; // added on version 2
             });
         }
         catch (e) {
@@ -157,6 +158,21 @@ myIO.controller = (function ($) {
         }
     };
     
+    var dropDB = function () { // DM-009, added on version 2
+        var query = 'DROP TABLE myIO_DB;';
+        try {
+            localDB.transaction(function(transaction){
+                transaction.executeSql(query, [], nullDataHandler, errorHandler);
+                updateStatus("Table 'myIO_DB' has been deleted");
+                document.getElementById('database').innerHTML = "Empty!";
+            });
+        }
+        catch (e) {
+            updateStatus("Error: unable to delete table 'myIO_DB' " + e + ".");
+            return;
+        }
+    };
+    
     errorHandler = function(transaction, error){
         updateStatus("Error: " + error.message);
         return true;
@@ -171,6 +187,8 @@ myIO.controller = (function ($) {
     
     var init = function () {
         var d = $(document);
+        d.delegate("#bt_reset", "tap", dropDB); // DM-009, added on version 2
+        d.delegate("#bt_new", "tap", checkDB); // added on version 2
         checkDB();
     };
     
