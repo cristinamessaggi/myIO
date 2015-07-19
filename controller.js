@@ -1,4 +1,4 @@
-// MyIO version 3 - covering: DM-003, DM-010
+// MyIO version 4 - covering: DM-004
 
 var myIO = myIO || {};
 
@@ -100,7 +100,6 @@ myIO.controller = (function ($) {
                             aux2 = 1;
                         }
                     }
-                    // showData(); (removed on version 3)
                 }, function(transaction, error){
                     updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                 });
@@ -187,6 +186,12 @@ myIO.controller = (function ($) {
         document.getElementById('status').innerHTML = status;
     };
     
+    function cancel(){ // added on version 4
+        var s = window.location.href;
+        s = s.substring(0, s.indexOf('#'));
+        window.location = s;
+    }
+    
     var renderMonths = function () { // DM-003, added on version 3
         var query = 'SELECT * FROM myIO_DB WHERE id=1;';
         try {
@@ -226,18 +231,105 @@ myIO.controller = (function ($) {
         };
     };
     
+    var renderDays = function (data) { // DM-004, added on version 4
+        var u = $.mobile.path.parseUrl(data.options.fromPage.context.URL);
+        var re = "^#" + "days";
+        if (u.hash.search(re) !== -1) {
+            var queryStringObj = queryStringToObject(data.options.queryString);
+            var pageId = queryStringObj["monthId"];
+            current_month = pageId;
+            var tempDB = new Array();
+            var query = 'SELECT * FROM myIO_DB WHERE month='+pageId+';';
+            try {
+                localDB.transaction(function(transaction){
+                    transaction.executeSql(query, [], function(transaction, results){
+                        for (var i = 0; i < results.rows.length; i++) {
+                            var row = results.rows.item(i);
+                            tempDB[i] = new Array();
+                            tempDB[i][0] = row['day'];
+                            tempDB[i][1] = row['value'];
+                            tempDB[i][2] = row['desc'];
+                            tempDB[i][3] = row['balance'];
+                        }
+                        var lastday = row['day'];
+                        var view = $("#days-content");
+                        view.empty();
+                        document.getElementById("days_h").innerHTML = month[row['month']]+" "+row['year'];
+                        var ul = $("<ul id=\"notes-list\" data-role=\"listview\" class=\"ui-grid-c\" data-theme=\"c\"></ul>").appendTo(view);
+                        $("<li data-theme=\"b\" data-icon=\"false\" data-mini=\"true\">"
+                          + "<a href=\"#\">"
+                          + "<span class=\"ui-block-a\">day</span>"
+                          + "<span class=\"ui-block-b\">value (&pound)</span>"
+                          + "<span class=\"ui-block-c\">description</span>"
+                          + "<span class=\"ui-block-d\">balance (&pound)</span>"
+                          + "</a>"
+                          + "</li>").appendTo(ul);
+                        for (i = 0; i < lastday; i++) {
+                            $("<li>"
+                              + "<a href=\"copy.html#edit?dayId="+(i+1)+"\">"
+                              + "<span class=\"ui-block-a\">&nbsp;"+tempDB[i][0]+"</span>"
+                              + "<span class=\"ui-block-b\">&nbsp;"+tempDB[i][1]+"</span>"
+                              + "<span class=\"ui-block-c\">&nbsp;&nbsp;"+tempDB[i][2]+"</span>"
+                              + "<span class=\"ui-block-d\">&nbsp;&nbsp;&nbsp;"+tempDB[i][3]+"</span>"
+                              + "</a>"
+                              + "</li>").appendTo(ul);
+                        }
+                        ul.listview();
+                    }, function(transaction, error){
+                        updateStatus("Error: " + error.code + "<br>Message: " + error.message);
+                    });
+                });
+            }
+            catch (e) {
+                updateStatus("Error: unable to select myIO_DB from the db " + e + ".");
+            };
+        };
+    };
+    
+    var onPageBeforeChange = function (event, data) { // added on version 4
+        if (typeof data.toPage === "string") {
+            var url = $.mobile.path.parseUrl(data.toPage);
+            if ($.mobile.path.isEmbeddedPage(url)) {
+                data.options.queryString = $.mobile.path.parseUrl(url.hash.replace(/^#/, "")).search.replace("?", "");
+            }
+        }
+    };
+    
     var onPageChange = function (event, data) { // added on version 3
         var toPageId = data.toPage.attr("id");
+        var fromPageId = null; // added on version 4
+        if (data.options.fromPage) { // added on version 4
+            fromPageId = data.options.fromPage.attr("id");
+        }
         switch (toPageId) {
             case "home": renderMonths(); break; // DM-003, added on version 3
+            case "days": // DM-004, added on version 4
+                if (fromPageId === "home") {
+                    renderDays(data);
+                } break;
         }
+    };
+    
+    var queryStringToObject = function (queryString) { // added on version 4
+        var queryStringObj = {};
+        var e;
+        var a = /\+/g;
+        var r = /([^&;=]+)=?([^&;]*)/g;
+        var d = function (s) { return decodeURIComponent(s.replace(a, " ")); };
+        e = r.exec(queryString);
+        while (e) {
+            queryStringObj[d(e[1])] = d(e[2]);
+            e = r.exec(queryString);
+        }
+        return queryStringObj;
     };
     
     var init = function () {
         var d = $(document);
+        d.bind("pagebeforechange", onPageBeforeChange); // added on version 4
         d.bind("pagechange", onPageChange); // added on version 3
         d.delegate("#bt_reset", "tap", dropDB); // DM-009, added on version 2
-        // d.delegate("#bt_new", "tap", checkDB); (removed on version 3)
+        d.delegate("#bt_home", "tap", cancel); // added on version 4
         checkDB();
     };
     
