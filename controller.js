@@ -1,4 +1,4 @@
-// MyIO version 4 - covering: DM-004
+// MyIO version 5 - covering: DM-005
 
 var myIO = myIO || {};
 
@@ -286,6 +286,34 @@ myIO.controller = (function ($) {
         };
     };
     
+    function renderForm(data){ // DM-005, added on version 5
+        var u = $.mobile.path.parseUrl(data.options.fromPage.context.URL);
+        var re = "^#" + "edit";
+        if (u.hash.search(re) !== -1) {
+            var queryStringObj = queryStringToObject(data.options.queryString);
+            var pageId = queryStringObj["dayId"];
+            var query = 'SELECT * FROM myIO_DB WHERE day='+pageId+' and month='+current_month+';';
+            try {
+                localDB.transaction(function(transaction){
+                    transaction.executeSql(query, [], function(transaction, results){
+                        for (var i = 0; i < results.rows.length; i++) {
+                            var row = results.rows.item(i);
+                        }
+                        document.getElementById("edit_h").innerHTML = row['day']+" "+month[row['month']];
+                        document.getElementById("value").value = row['value'];
+                        document.getElementById("desc").value = row['desc'];
+                        document.getElementById("balance").value = row['balance'];#
+                    }, function(transaction, error){
+                        updateStatus("Error: " + error.code + "<br>Message: " + error.message);
+                    });
+                });
+            }
+            catch (e) {
+                updateStatus("Error: unable to select myIO_DB from the db " + e + ".");
+            }
+        };
+    };
+    
     var onPageBeforeChange = function (event, data) { // added on version 4
         if (typeof data.toPage === "string") {
             var url = $.mobile.path.parseUrl(data.toPage);
@@ -306,6 +334,10 @@ myIO.controller = (function ($) {
             case "days": // DM-004, added on version 4
                 if (fromPageId === "home") {
                     renderDays(data);
+                } break;
+            case "edit": // DM-005, added on version 5
+                if (fromPageId === "days") {
+                    renderForm(data);
                 } break;
         }
     };
