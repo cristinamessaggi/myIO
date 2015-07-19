@@ -1,4 +1,4 @@
-<!-- MyIO version 1 - covering: DM-001, DM-002 -->
+<!-- MyIO version 2 - covering: DM-008, DM-009 -->
 
 <html>
     
@@ -12,13 +12,32 @@
     </head>
     
     <body>
+        
         <div data-role="page" id="home">
             <div data-role="header" data-position="fixed"><h1>MyIO</h1></div>
             <div data-role="content" id="home-content">
                 <h5>STATUS:<p id="status"></p></h5>
                 <h5>DATABASE:<p id="database"></p></h5>
             </div>
+            <div data-role="footer" data-position="fixed"> <!-- DM-008, added on version 2 -->
+                <div data-role="navbar" data-iconpos="top">
+                    <ul>
+                        <li><a href="#" data-icon="info">Info</a></li>
+                        <li><a href="#reset-dialog" data-icon="minus">Reset</a></li>
+                        <li><a href="#" data-icon="plus" id="bt_new">New</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
+        
+        <div id="reset-dialog" data-role="dialog"> <!-- DM-008, added on version 2 -->
+            <div data-role="header"><h1>Delete ALL?</h1></div>
+            <div data-role="content">
+                <a data-role="button" data-theme="d" data-rel="back">No!</a>
+                <a data-role="button" data-theme="b" data-rel="back" id="bt_reset">Yes!</a>
+            </div>
+        </div>
+    
     </body>
 
 </html>
