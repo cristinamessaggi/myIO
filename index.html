@@ -1,4 +1,4 @@
-<!-- MyIO version 3 - covering: DM-003, DM-010 -->
+<!-- MyIO version 4 - covering: DM-004 -->
 
 <html>
     
@@ -16,14 +16,12 @@
         <div data-role="page" id="home">
             <div data-role="header" data-position="fixed"><h1>MyIO</h1></div>
             <div data-role="content" id="home-content">
-                <!-- <h5>STATUS:<p id="status"></p></h5>
-                <h5>DATABASE:<p id="database"></p></h5> (removed on version 3) -->
                 <h3>MyIO Application Prototype</h3>
                 <p>Study of Mobile Phone Application Development</p>
                 <p>A dissertation submitted for the MSc in Software Engineering</p>
                 <p>by Cristina Messaggi de Souza</p>
                 <p>November 2012</p>
-                <a href="#home" data-role="button" data-icon="refresh">Start MyIO Version 3</a>
+                <a href="#home" data-role="button" data-icon="refresh">Start MyIO Version 4</a>
             </div>
             <div data-role="footer" data-position="fixed"> <!-- DM-008, added on version 2 -->
                 <div data-role="navbar" data-iconpos="top">
@@ -41,6 +39,18 @@
             <div data-role="content">
                 <a data-role="button" data-theme="d" data-rel="back">No!</a>
                 <a data-role="button" data-theme="b" data-rel="back" id="bt_reset">Yes!</a>
+            </div>
+        </div>
+        
+        <div data-role="page" id="days"> <!-- DM-004, added on version 4 -->
+            <div data-role="header" data-position="fixed"><h1 id="days_h"></h1></div>
+            <div data-role="content" id="days-content"></div>
+            <div data-role="footer" data-position="fixed">
+                <div data-role="navbar" data-iconpos="top">
+                    <ul>
+                        <li><a href="#" data-icon="home" data-theme="a" id="bt_home">Home</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     
