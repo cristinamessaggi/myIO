@@ -1,6 +1,6 @@
-<!-- MyIO version 7 - covering: DM-007 -->
+<!-- MyIO version 8 (final) - covering: DM-010 -->
 
-<html>
+<html manifest="myIO.manifest"> <!-- DM-010, added on version 8 -->
     
     <head>
         <title>MyIO - Control your INs and OUTs</title>
@@ -26,13 +26,15 @@
                 <p>Study of Mobile Phone Application Development</p>
                 <p>A dissertation submitted for the MSc in Software Engineering</p>
                 <p>by Cristina Messaggi de Souza</p>
+                <a href="#home" data-role="button" data-icon="refresh">Start MyIO Final Version</a>
+                <p><i>The prototype was developed as a web application, running cross devices with a single implementation. WebSQL was used to handle the local data storage due to my familiarisation with SQL and currently broader browser capability. <b>Handling of data needs to be more explored in future implementations</b> as local storage can be turned off by the user (disabling the application to run) and due to data security (can be considered sensitive data). Another elements also need to be revisited, such as datatype validation and offline run.</i></p>
                 <p>November 2012</p>
-                <a href="#home" data-role="button" data-icon="refresh">Start MyIO Version 7</a>
+            
             </div>
             <div data-role="footer" data-position="fixed"> <!-- DM-008, added on version 2 -->
                 <div data-role="navbar" data-iconpos="top">
                     <ul>
-                        <li><a href="#" data-icon="info">Info</a></li>
+                        <li><a href="#info" data-icon="info">Info</a></li>
                         <li><a href="#reset-dialog" data-icon="minus">Reset</a></li>
                         <li><a href="#" data-icon="delete">Close</a></li> <!-- line updated on version 3 -->
                     </ul>
@@ -82,7 +84,26 @@
                 </div>
             </div>
         </div>
-    
+        
+        <div data-role="page" id="info"> <!-- added version 8 -->
+            <div data-role="header" data-position="fixed"><h1>Info</h1></div>
+            <div data-role="content">
+                <h3>MyIO Application Prototype</h3>
+                <p>Study of Mobile Phone Application Development</p>
+                <p>A dissertation submitted for the MSc in Software Engineering</p>
+                <p>by Cristina Messaggi de Souza</p>
+                <p><i>The prototype was developed as a web application, running cross devices with a single implementation. WebSQL was used to handle the local data storage due to my familiarisation with SQL and currently broader browser capability. <b>Handling of data needs to be more explored in future implementations</b> as local storage can be turned off by the user (disabling the application to run) and due to data security (can be considered sensitive data). Another elements also need to be revisited, such as datatype validation and offline run.</i></p>
+                <p>November 2012</p>
+            </div>
+            <div data-role="footer" data-position="fixed">
+                <div data-role="navbar" data-iconpos="top">
+                    <ul>
+                        <li><a href="#" data-icon="home" data-theme="a" id="bt_home">Home</a></li>
+					</ul>
+				</div>	
+			</div>
+		</div>
+        
     </body>
 
 </html>
