@@ -1,4 +1,4 @@
-// MyIO version 6 - covering: DM-006
+// MyIO version 7 - covering: DM-007
 
 var myIO = myIO || {};
 
@@ -181,7 +181,6 @@ myIO.controller = (function ($) {
                                     if (!results.rowsAffected) {
                                         updateStatus("Error: no rows affected.");
                                     }
-                                    cancel();
                                 }, errorHandler);
                             });
                         }
@@ -189,6 +188,21 @@ myIO.controller = (function ($) {
                             updateStatus("Error: unable to perform an UPDATE " + e + ".");
                         }
                     };
+                    var query3 = 'UPDATE myIO_DB SET balance=balance+'+dif+' WHERE id>'+current_id+';'; // DM-007, added on version 7
+                    try {
+                        localDB.transaction(function(transaction){
+                            transaction.executeSql(query3, [], function(transaction, results){
+                                if (!results.rowsAffected) {
+                                    updateStatus("Error: no rows affected.");
+                                }
+                                cancel();
+                            }, errorHandler);
+                        });
+                    }
+                    catch (e) {
+                        updateStatus("Error: unable to perform an UPDATE " + e + ".");
+                    }
+                    
                 }, function(transaction, error){
                     updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                 });
@@ -343,7 +357,7 @@ myIO.controller = (function ($) {
                         document.getElementById("edit_h").innerHTML = row['day']+" "+month[row['month']];
                         document.getElementById("value").value = row['value'];
                         document.getElementById("desc").value = row['desc'];
-                        document.getElementById("balance").value = row['balance'];#
+                        document.getElementById("balance").value = row['balance'];
                     }, function(transaction, error){
                         updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                     });
@@ -353,6 +367,11 @@ myIO.controller = (function ($) {
                 updateStatus("Error: unable to select myIO_DB from the db " + e + ".");
             }
         };
+    };
+    
+    var resetForm = function () { // added on version 7
+        document.getElementById("value").value = "";
+        document.getElementById("desc").value = "";
     };
     
     var onPageBeforeChange = function (event, data) { // added on version 4
@@ -402,6 +421,7 @@ myIO.controller = (function ($) {
         d.bind("pagebeforechange", onPageBeforeChange); // added on version 4
         d.bind("pagechange", onPageChange); // added on version 3
         d.delegate("#bt_reset", "tap", dropDB); // DM-009, added on version 2
+        d.delegate("#bt_resetform", "tap", resetForm); // added on version 7
         d.delegate("#bt_confirm", "tap", confirmUpdate); // DM-006, added on version 6
         d.delegate("#bt_home", "tap", cancel); // added on version 4
         checkDB();
