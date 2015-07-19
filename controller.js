@@ -1,4 +1,4 @@
-// MyIO version 5 - covering: DM-005
+// MyIO version 6 - covering: DM-006
 
 var myIO = myIO || {};
 
@@ -148,6 +148,47 @@ myIO.controller = (function ($) {
                         document.getElementById("database").appendChild(li);
                     }
                     updateStatus("Table 'myIO_DB' is present"); // added on version 3
+                }, function(transaction, error){
+                    updateStatus("Error: " + error.code + "<br>Message: " + error.message);
+                });
+            });
+        }
+        catch (e) {
+            updateStatus("Error: unable to select myIO_DB from the db " + e + ".");
+        }
+    };
+    
+    var confirmUpdate = function() { // DM-006, added on version 6
+        var pageId = $.mobile.path.get();
+        pageId = pageId.replace("edit?dayId=","");
+        var newvalue = document.getElementById("value").value;
+        var newdesc = document.getElementById("desc").value;
+        var query = 'SELECT * FROM myIO_DB WHERE day='+pageId+' and month='+current_month+';';
+        try {
+            localDB.transaction(function(transaction){
+                transaction.executeSql(query, [], function(transaction, results){
+                    for (var i = 0; i < results.rows.length; i++) {
+                        var row = results.rows.item(i);
+                        var oldvalue = row.value;
+                        var oldbalance = row.balance;
+                        var dif = newvalue - oldvalue;
+                        var newbalance = oldbalance + dif;
+                        var current_id = row.id;
+                        var query2 = 'UPDATE myIO_DB SET value=?, desc=?, balance=? WHERE day=? and month=?;';
+                        try {
+                            localDB.transaction(function(transaction){
+                                transaction.executeSql(query2, [newvalue, newdesc, newbalance, pageId, current_month], function(transaction, results){
+                                    if (!results.rowsAffected) {
+                                        updateStatus("Error: no rows affected.");
+                                    }
+                                    cancel();
+                                }, errorHandler);
+                            });
+                        }
+                        catch (e) {
+                            updateStatus("Error: unable to perform an UPDATE " + e + ".");
+                        }
+                    };
                 }, function(transaction, error){
                     updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                 });
@@ -361,6 +402,7 @@ myIO.controller = (function ($) {
         d.bind("pagebeforechange", onPageBeforeChange); // added on version 4
         d.bind("pagechange", onPageChange); // added on version 3
         d.delegate("#bt_reset", "tap", dropDB); // DM-009, added on version 2
+        d.delegate("#bt_confirm", "tap", confirmUpdate); // DM-006, added on version 6
         d.delegate("#bt_home", "tap", cancel); // added on version 4
         checkDB();
     };
