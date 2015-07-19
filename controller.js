@@ -1,4 +1,4 @@
-// MyIO version 7 - covering: DM-007
+// MyIO version 8 (final) - covering: DM-010
 
 var myIO = myIO || {};
 
@@ -274,8 +274,29 @@ myIO.controller = (function ($) {
                         $("<li data-theme=\"b\"><h3>status:</h3><p id=\"status\"></p></li>").appendTo(ul);
                         $("<li data-theme=\"b\"><h3>database:</h3><p id=\"database\"></p></li>").appendTo(ul);
                         ul.listview();
+                        renderBalance(); // added on version 8
                         showData();
                     }
+                }, function(transaction, error){
+                    updateStatus("Error: " + error.code + "<br>Message: " + error.message);
+                });
+            });
+        }
+        catch (e) {
+            updateStatus("Error: unable to select myIO_DB from the db " + e + ".");
+        };
+    };
+    
+    var renderBalance = function () { // added on version 8
+        var query = 'SELECT * FROM myIO_DB WHERE day=1;';
+        try {
+            localDB.transaction(function(transaction){
+                transaction.executeSql(query, [], function(transaction, results){
+                    for (var i = 0; i < results.rows.length; i++) {
+                        var row = results.rows.item(i);
+                        var start = row['balance'];
+                        document.getElementById(month[row['month']]).innerHTML = "<strong>starting with</strong>: "+start;
+                    };
                 }, function(transaction, error){
                     updateStatus("Error: " + error.code + "<br>Message: " + error.message);
                 });
