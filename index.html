@@ -1,4 +1,4 @@
-<!-- MyIO version 4 - covering: DM-004 -->
+<!-- MyIO version 5 - covering: DM-005 -->
 
 <html>
     
@@ -9,6 +9,12 @@
         <script src="lib/jqm/jquery-1.7.1.min.js" type="text/javascript"></script>
         <script src="controller.js" type="text/javascript"></script>
         <script src="lib/jqm/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
+        <script> <!-- added on version 5 -->
+            function SelectAll(id){
+                document.getElementById(id).focus();
+                document.getElementById(id).select();
+            };
+        </script>
     </head>
     
     <body>
@@ -49,6 +55,28 @@
                 <div data-role="navbar" data-iconpos="top">
                     <ul>
                         <li><a href="#" data-icon="home" data-theme="a" id="bt_home">Home</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div data-role="page" id="edit" data-theme="b"> <!-- DM-005, added on version 5 -->
+            <div data-role="header" data-position="fixed"><h1 id="edit_h"></h1></div>
+            <div data-role="content" id="edit-content">
+                <form action="" method="post" id="form">
+                    <label for="value">Value:</label>
+                    <input type="text" name="value" id="value" value="" onClick="SelectAll('value');"/>
+                    <label for="desc">Description:</label>
+                    <input type="text" name="desc" id="desc" value="" onClick="SelectAll('desc');"/>
+                    <label for="balance">Balance:</label>
+                    <input type="text" name="balance" id="balance" value="" disabled="true"/>
+                </form>
+            </div>
+            <div data-role="footer" data-position="fixed">
+                <div data-role="navbar" data-iconpos="top">
+                    <ul>
+                        <li><a href="#" data-icon="check" id="bt_confirm">Confirm</a></li>
+                        <li><a href="#" data-icon="home" id="bt_home">Home</a></li>
                     </ul>
                 </div>
             </div>
